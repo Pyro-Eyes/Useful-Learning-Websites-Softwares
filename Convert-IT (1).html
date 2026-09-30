@@ -1,0 +1,1713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Convert IT — Free Online File Converter</title>
+<meta name="description" content="Convert IT — a free, private, in-browser file converter. Images, documents, video, audio, archives and more.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%234F46E5'/%3E%3Cstop offset='1' stop-color='%2306B6D4'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect x='2' y='2' width='36' height='36' rx='10' fill='url(%23g)'/%3E%3Cpath d='M12 18a8 8 0 0 1 14-3' stroke='white' stroke-width='2.8' fill='none' stroke-linecap='round'/%3E%3Cpath d='M28 22a8 8 0 0 1-14 3' stroke='white' stroke-width='2.8' fill='none' stroke-linecap='round'/%3E%3Cpath d='M26 10v6h-6z' fill='white'/%3E%3Cpath d='M14 30v-6h6z' fill='white'/%3E%3C/svg%3E">
+<style>
+  :root{
+    --ink:#111827; --muted:#6b7280; --line:#e5e7eb; --bg:#ffffff; --card:#ffffff;
+    --accent:#4f46e5; --accent2:#06b6d4; --accent-soft:#eef2ff; --ok:#059669; --err:#dc2626;
+    --radius:16px;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{font-family:'Segoe UI', system-ui, -apple-system, Roboto, 'Helvetica Neue', Arial, sans-serif; background:var(--bg); color:var(--ink); line-height:1.55; -webkit-font-smoothing:antialiased;}
+  .wrap{max-width:1000px; margin:0 auto; padding:0 20px;}
+
+  /* Header */
+  header{position:sticky; top:0; z-index:50; background:rgba(255,255,255,.92); backdrop-filter:blur(8px); border-bottom:1px solid var(--line);}
+  .nav{display:flex; align-items:center; justify-content:space-between; padding:14px 0;}
+  .logo{display:flex; align-items:center; gap:10px; text-decoration:none; color:var(--ink);}
+  .logo .mark{width:38px; height:38px; display:block;}
+  .logo .word{font-size:1.35rem; font-weight:800; letter-spacing:-.02em;}
+  .logo .word .it{background:linear-gradient(120deg,var(--accent),var(--accent2)); -webkit-background-clip:text; background-clip:text; color:transparent;}
+  .nav .links{display:flex; gap:22px;}
+  .nav .links a{color:var(--muted); text-decoration:none; font-size:.92rem; font-weight:600;}
+  .nav .links a:hover{color:var(--accent);}
+
+  /* Hero */
+  .hero{text-align:center; padding:56px 0 34px;}
+  .hero h1{font-size:clamp(1.7rem, 4vw, 2.7rem); font-weight:800; letter-spacing:-.03em;}
+  .hero h1 span{background:linear-gradient(120deg,var(--accent),var(--accent2)); -webkit-background-clip:text; background-clip:text; color:transparent;}
+  .hero p{color:var(--muted); max-width:620px; margin:12px auto 0; font-size:1.02rem;}
+  .badges{display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:18px;}
+  .badge{font-size:.78rem; font-weight:700; color:var(--accent); background:var(--accent-soft); border:1px solid #dfe3ff; padding:5px 12px; border-radius:999px;}
+
+  /* Converter card */
+  .card{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:0 10px 30px rgba(17,24,39,.06); padding:22px; margin-top:10px;}
+  .drop{border:2px dashed #c7cbf5; border-radius:14px; padding:38px 20px; text-align:center; cursor:pointer; transition:.18s; background:#fbfbff;}
+  .drop:hover,.drop.over{border-color:var(--accent); background:var(--accent-soft);}
+  .drop .big{font-size:1.06rem; font-weight:700;}
+  .drop .small{color:var(--muted); font-size:.86rem; margin-top:5px;}
+  .drop svg{margin-bottom:10px;}
+  .hint{font-size:.85rem; color:var(--muted); margin-top:10px; text-align:center;}
+  .hint b{color:var(--ink);}
+
+  .files{display:flex; flex-wrap:wrap; gap:8px; margin-top:14px;}
+  .file-chip{display:flex; align-items:center; gap:8px; background:var(--accent-soft); border:1px solid #dfe3ff; border-radius:10px; padding:6px 10px; font-size:.85rem; font-weight:600;}
+  .file-chip img{width:26px; height:26px; object-fit:cover; border-radius:6px; background:#fff;}
+  .file-chip button{border:none; background:none; color:var(--muted); cursor:pointer; font-size:1rem; line-height:1; padding:2px;}
+  .file-chip button:hover{color:var(--err);}
+  .clear-btn{border:none; background:none; color:var(--accent); font-weight:700; font-size:.82rem; cursor:pointer; margin-top:8px;}
+
+  .section-label{font-size:.78rem; font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); margin:20px 0 10px;}
+  .chips{display:flex; flex-wrap:wrap; gap:8px;}
+  .chip{border:1.5px solid var(--line); background:#fff; color:var(--ink); border-radius:999px; padding:7px 15px; font-size:.87rem; font-weight:700; cursor:pointer; transition:.15s;}
+  .chip:hover{border-color:var(--accent); color:var(--accent);}
+  .chip.sel{background:linear-gradient(120deg,var(--accent),var(--accent2)); border-color:transparent; color:#fff;}
+  .chip.soon{color:#b0b4bd; border-style:dashed; cursor:not-allowed; background:#fafafa;}
+  .chip.soon:hover{border-color:var(--line); color:#b0b4bd;}
+  .chip .tag{font-size:.62rem; font-weight:800; color:#9aa0ad; margin-left:5px; vertical-align:1px;}
+
+  .options{display:flex; flex-wrap:wrap; gap:14px; margin-top:16px; align-items:center;}
+  .opt{display:flex; align-items:center; gap:7px; font-size:.86rem; color:var(--ink); font-weight:600;}
+  .opt select,.opt input{border:1px solid var(--line); border-radius:9px; padding:7px 10px; font-size:.86rem; background:#fff; color:var(--ink); font-weight:600;}
+  .opt input[type=number]{width:90px;}
+
+  .actions{margin-top:20px; display:flex; gap:12px; align-items:center; flex-wrap:wrap;}
+  .btn{border:none; border-radius:12px; padding:13px 28px; font-size:1rem; font-weight:800; cursor:pointer; transition:.18s;}
+  .btn-primary{background:linear-gradient(120deg,var(--accent),var(--accent2)); color:#fff; box-shadow:0 6px 18px rgba(79,70,229,.3);}
+  .btn-primary:hover{transform:translateY(-1px); box-shadow:0 9px 22px rgba(79,70,229,.38);}
+  .btn-primary:disabled{opacity:.45; cursor:not-allowed; transform:none; box-shadow:none;}
+  .btn-ghost{background:#fff; border:1.5px solid var(--line); color:var(--ink);}
+  .btn-ghost:hover{border-color:var(--accent); color:var(--accent);}
+
+  .progress-wrap{display:none; margin-top:18px;}
+  .progress-wrap.show{display:block;}
+  .progress-label{font-size:.85rem; color:var(--muted); margin-bottom:7px; display:flex; justify-content:space-between;}
+  .bar{height:9px; background:var(--line); border-radius:99px; overflow:hidden;}
+  .bar i{display:block; height:100%; width:0%; background:linear-gradient(90deg,var(--accent),var(--accent2)); border-radius:99px; transition:width .25s;}
+
+  .results{margin-top:22px; display:none;}
+  .results.show{display:block;}
+  .results h3{font-size:1rem; margin-bottom:12px;}
+  .results h3 .ok{color:var(--ok);}
+  .result-row{display:flex; align-items:center; gap:12px; padding:11px 14px; border:1px solid var(--line); border-radius:12px; margin-bottom:8px; background:#fff;}
+  .result-row .ficon{width:36px; height:36px; border-radius:9px; background:var(--accent-soft); display:flex; align-items:center; justify-content:center; font-size:.7rem; font-weight:900; color:var(--accent);}
+  .result-row .meta{flex:1; min-width:0;}
+  .result-row .name{font-weight:700; font-size:.9rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .result-row .size{color:var(--muted); font-size:.78rem;}
+  .result-row a{background:var(--accent-soft); color:var(--accent); text-decoration:none; font-weight:800; font-size:.83rem; padding:8px 15px; border-radius:9px; white-space:nowrap;}
+  .result-row a:hover{background:#e0e5ff;}
+
+  /* Catalog */
+  .catalog{margin:64px 0 20px;}
+  .catalog h2{font-size:1.5rem; letter-spacing:-.02em; margin-bottom:6px;}
+  .catalog .sub{color:var(--muted); margin-bottom:26px; font-size:.95rem;}
+  .cat-block{border:1px solid var(--line); border-radius:var(--radius); padding:20px; margin-bottom:16px; background:#fff;}
+  .cat-block h3{font-size:1.02rem; display:flex; align-items:center; gap:9px; margin-bottom:14px;}
+  .cat-block h3 .n{width:26px; height:26px; border-radius:8px; background:linear-gradient(120deg,var(--accent),var(--accent2)); color:#fff; font-size:.8rem; display:inline-flex; align-items:center; justify-content:center;}
+  .conv-row{display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin-bottom:9px;}
+  .conv-row:last-child{margin-bottom:0;}
+  .conv-row .src{font-weight:800; font-size:.82rem; background:#f3f4f6; border-radius:7px; padding:3px 9px;}
+  .conv-row .arr{color:#9ca3af; font-size:.8rem;}
+  .conv-row .dst{font-size:.76rem; font-weight:700; color:#374151; background:#f9fafb; border:1px solid var(--line); border-radius:7px; padding:2px 8px;}
+  .conv-row .dst.soon{color:#b0b4bd; border-style:dashed;}
+  .note{font-size:.82rem; color:var(--muted); margin-top:10px;}
+
+  /* Footer */
+  footer{border-top:1px solid var(--line); margin-top:40px; padding:28px 0 34px; text-align:center;}
+  footer .flogo{display:inline-flex; align-items:center; gap:8px; font-weight:800; margin-bottom:8px;}
+  footer .flogo .mark{width:26px; height:26px;}
+  footer p{color:var(--muted); font-size:.86rem;}
+  footer p b{color:var(--ink);}
+
+  /* Toast */
+  #toast{position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px); background:#111827; color:#fff; padding:12px 20px; border-radius:12px; font-size:.88rem; font-weight:600; opacity:0; pointer-events:none; transition:.25s; z-index:99; max-width:90vw; box-shadow:0 10px 30px rgba(0,0,0,.25);}
+  #toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+  #toast.err{background:#b91c1c;}
+
+  @media (max-width:640px){
+    .nav .links{display:none;}
+    .card{padding:16px;}
+    .drop{padding:28px 14px;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <a class="logo" href="#">
+      <svg class="mark" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="lg" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#4F46E5"/><stop offset="1" stop-color="#06B6D4"/>
+          </linearGradient>
+        </defs>
+        <rect x="2" y="2" width="36" height="36" rx="10" fill="url(#lg)"/>
+        <path d="M12 18a8 8 0 0 1 14-3.2" stroke="#fff" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+        <path d="M28 22a8 8 0 0 1-14 3.2" stroke="#fff" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+        <path d="M26.5 9.5v6h-6z" fill="#fff"/>
+        <path d="M13.5 30.5v-6h6z" fill="#fff"/>
+      </svg>
+      <span class="word">Convert <span class="it">IT</span></span>
+    </a>
+    <nav class="links">
+      <a href="#converter">Converter</a>
+      <a href="#catalog">Supported Formats</a>
+      <a href="#catalog">Archives</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+
+    <section class="hero">
+      <h1>Convert anything, <span>right in your browser</span></h1>
+      <p>Images, documents, video, audio and archives — converted instantly on your device. No uploads, no sign-up, no waiting.</p>
+      <div class="badges">
+        <span class="badge">100% Private — files never leave your device</span>
+        <span class="badge">No sign-up</span>
+        <span class="badge">Unlimited & free</span>
+      </div>
+    </section>
+
+    <section class="card" id="converter">
+      <div class="drop" id="drop">
+        <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        <div class="big">Drag & drop your files here</div>
+        <div class="small">or <u>browse files</u> — images, PDF, Word, Excel, video, audio, ZIP</div>
+        <input type="file" id="fileInput" multiple hidden>
+      </div>
+      <div class="hint">Tip: select <b>multiple images</b> to merge them into one <b>PDF, GIF or MP4</b>.</div>
+
+      <div id="fileArea" style="display:none;">
+        <div class="files" id="fileList"></div>
+        <button class="clear-btn" id="clearBtn">✕ Remove all files</button>
+        <div class="section-label" id="targetLabel">Convert to</div>
+        <div class="chips" id="targetChips"></div>
+        <div class="options" id="optionsRow">
+          <label class="opt">Quality
+            <select id="quality">
+              <option value="best">High</option>
+              <option value="std">Standard (smaller file)</option>
+            </select>
+          </label>
+          <label class="opt" id="flattenOpt" style="display:none;">Transparent background
+            <select id="flatten">
+              <option value="white">Flatten to white</option>
+              <option value="keep">Keep transparent (PNG/WEBP only)</option>
+            </select>
+          </label>
+          <label class="opt" id="frameOpt" style="display:none;">Frame at (seconds)
+            <input type="number" id="frameTime" min="0" step="0.5" value="0">
+          </label>
+        </div>
+        <div class="actions">
+          <button class="btn btn-primary" id="convertBtn" disabled>Convert Now</button>
+        </div>
+      </div>
+
+      <div class="progress-wrap" id="progressWrap">
+        <div class="progress-label"><span id="progressText">Working…</span><span id="progressPct"></span></div>
+        <div class="bar"><i id="progressBar"></i></div>
+      </div>
+
+      <div class="results" id="results">
+        <h3><span class="ok">✔ Done!</span> <span id="resultsCount"></span></h3>
+        <div id="resultList"></div>
+        <div class="actions" id="zipAllRow" style="display:none;">
+          <button class="btn btn-ghost" id="zipAllBtn">⬇ Download all as ZIP</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="catalog" id="catalog">
+      <h2>Supported conversions</h2>
+      <p class="sub">Almost every popular format pair. Dashed items are on our roadmap. All processing happens locally in your browser.</p>
+      <div id="catalogBody"></div>
+    </section>
+
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="flogo">
+      <svg class="mark" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+        <defs><linearGradient id="fg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4F46E5"/><stop offset="1" stop-color="#06B6D4"/></linearGradient></defs>
+        <rect x="2" y="2" width="36" height="36" rx="10" fill="url(#fg)"/>
+        <path d="M12 18a8 8 0 0 1 14-3.2" stroke="#fff" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+        <path d="M28 22a8 8 0 0 1-14 3.2" stroke="#fff" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+        <path d="M26.5 9.5v6h-6z" fill="#fff"/><path d="M13.5 30.5v-6h6z" fill="#fff"/>
+      </svg>
+      Convert <span style="background:linear-gradient(120deg,#4F46E5,#06B6D4);-webkit-background-clip:text;background-clip:text;color:transparent;">IT</span>
+    </div>
+    <p>Copyright © <span id="year"></span> Convert IT — All rights reserved by <b>PyroEyes (Satyam)</b></p>
+  </div>
+</footer>
+
+<div id="toast"></div>
+
+<script>
+"use strict";
+/* ============================================================
+   Convert IT — fully client-side file converter
+   ============================================================ */
+const $ = s => document.querySelector(s);
+document.getElementById('year').textContent = new Date().getFullYear();
+
+/* ---------- CDN libraries (lazy-loaded on demand) ---------- */
+const CDN = {
+  jspdf:    'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js',
+  jszip:    'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js',
+  pdfjs:    'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js',
+  pdfjsW:   'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js',
+  mammoth:  'https://unpkg.com/mammoth@1.6.0/mammoth.browser.min.js',
+  heic2any: 'https://cdnjs.cloudflare.com/ajax/libs/heic2any/0.0.4/heic2any.min.js',
+  xlsx:     'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js',
+  tesseract:'https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/4.1.1/tesseract.min.js',
+  utif:     'https://cdn.jsdelivr.net/npm/utif@3.1.0/UTIF.js',
+  ffmpegWorker: 'https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/umd/814.ffmpeg.js',
+  ffmpegCore:'https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd'
+};
+const _loaded = {};
+function loadScript(url){
+  if(_loaded[url]) return _loaded[url];
+  _loaded[url] = new Promise((res, rej)=>{
+    const s = document.createElement('script');
+    s.src = url; s.onload = res;
+    s.onerror = ()=>rej(new Error('Could not load a required engine. Please check your internet connection and try again.'));
+    document.head.appendChild(s);
+  });
+  return _loaded[url];
+}
+
+/* ---------- constants ---------- */
+const EXT_LABEL = {
+  jpg:'JPG', jpeg:'JPEG', png:'PNG', webp:'WEBP', gif:'GIF', bmp:'BMP', ico:'ICO', tiff:'TIFF',
+  svg:'SVG', heic:'HEIC', pdf:'PDF', doc:'DOC', docx:'DOCX', txt:'TXT', html:'HTML', rtf:'RTF',
+  odt:'ODT', epub:'EPUB', mobi:'MOBI', pptx:'PPTX', xlsx:'XLSX', csv:'CSV', mp4:'MP4', mkv:'MKV',
+  mov:'MOV', avi:'AVI', wmv:'WMV', flv:'FLV', mp3:'MP3', wav:'WAV', ogg:'OGG', aac:'AAC',
+  flac:'FLAC', m4a:'M4A', m4r:'M4R (Ringtone)', eps:'EPS', zip:'ZIP', extract:'Extract files',
+  tif:'TIFF', xls:'XLS', ppt:'PPT'
+};
+const MIME = {
+  png:'image/png', jpg:'image/jpeg', jpeg:'image/jpeg', webp:'image/webp', gif:'image/gif',
+  bmp:'image/bmp', ico:'image/x-icon', tiff:'image/tiff', pdf:'application/pdf',
+  html:'text/html', txt:'text/plain', csv:'text/csv', mp4:'video/mp4', mkv:'video/x-matroska',
+  mov:'video/quicktime', avi:'video/x-msvideo', wmv:'video/x-ms-wmv', flv:'video/x-flv',
+  webm:'video/webm', mp3:'audio/mpeg', wav:'audio/wav', ogg:'audio/ogg', aac:'audio/aac',
+  flac:'audio/flac', m4a:'audio/mp4', m4r:'audio/mp4', epub:'application/epub+zip',
+  xlsx:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  zip:'application/zip',
+  tif:'image/tiff', eps:'application/postscript',
+  odt:'application/vnd.oasis.opendocument.text', rtf:'application/rtf',
+  xls:'application/vnd.ms-excel', ppt:'PPT'
+};
+const IMAGE_EXTS = ['jpg','jpeg','png','webp','gif','bmp','ico','svg','heic','tiff','tif'];
+const ALPHA_EXTS = ['png','webp','gif','svg','heic','tiff','tif'];
+const VIDEO_EXTS = ['mp4','mkv','mov','webm','avi'];
+
+/* input registry: targets = available, soon = roadmap */
+const REG = {
+  jpg:  {cat:'image', targets:'png webp gif pdf bmp ico tiff eps txt docx'},
+  jpeg: {cat:'image', targets:'png webp gif pdf bmp ico tiff eps txt docx'},
+  png:  {cat:'image', targets:'jpg webp gif pdf bmp ico tiff eps txt docx'},
+  webp: {cat:'image', targets:'jpg png gif pdf bmp ico tiff eps txt docx'},
+  heic: {cat:'image', targets:'jpg png webp pdf tiff eps txt docx'},
+  svg:  {cat:'image', targets:'png jpg pdf tiff eps'},
+  gif:  {cat:'image', targets:'mp4 jpg png'},
+  ico:  {cat:'image', targets:'png jpg'},
+  tiff: {cat:'image', targets:'png jpg webp pdf bmp ico gif eps txt docx'},
+  tif:  {cat:'image', targets:'png jpg webp pdf bmp ico gif eps txt docx'},
+
+  pdf:  {cat:'document', targets:'txt jpg png html docx xlsx pptx epub'},
+  docx: {cat:'document', targets:'pdf txt html odt rtf epub jpg png'},
+  doc:  {cat:'document', soon:'pdf txt odt html epub rtf jpg'},
+  txt:  {cat:'document', targets:'pdf docx'},
+  epub: {cat:'document', targets:'txt pdf docx'},
+  mobi: {cat:'document', soon:'pdf docx txt'},
+  pptx: {cat:'document', targets:'pdf jpg png mp4'},
+  ppt:  {cat:'document', soon:'pdf jpg png mp4'},
+  xlsx: {cat:'document', targets:'csv txt pdf'},
+  xls:  {cat:'document', targets:'xlsx csv txt pdf'},
+  csv:  {cat:'document', targets:'xlsx pdf'},
+
+  mp4:  {cat:'video', targets:'avi mkv mov webm wmv flv gif webp mp3 wav jpg png'},
+  mkv:  {cat:'video', targets:'mp4 avi mov gif mp3 wav jpg png'},
+  mov:  {cat:'video', targets:'mp4 webm gif mp3 wav jpg png'},
+  webm: {cat:'video', targets:'mp4 avi gif mp3 wav jpg png'},
+  avi:  {cat:'video', targets:'mp4 mkv mov mp3 jpg png'},
+
+  wav:  {cat:'audio', targets:'mp3 ogg aac flac m4a'},
+  mp3:  {cat:'audio', targets:'wav ogg aac flac m4a m4r'},
+  flac: {cat:'audio', targets:'mp3 wav aac'},
+  m4a:  {cat:'audio', targets:'mp3 wav'},
+  aac:  {cat:'audio', targets:'mp3 wav'},
+  ogg:  {cat:'audio', targets:'mp3 wav'},
+
+  zip:  {cat:'archive', targets:'extract'},
+  rar:  {cat:'archive', soon:'extract'}
+};
+
+/* ---------- state ---------- */
+const state = { files: [], target: null, results: [] };
+
+/* ---------- helpers ---------- */
+function toast(msg, isErr){
+  const t = $('#toast');
+  t.textContent = msg;
+  t.className = 'show' + (isErr ? ' err' : '');
+  clearTimeout(t._h);
+  t._h = setTimeout(()=>{ t.className=''; }, 4200);
+}
+function fmtSize(bytes){
+  if(bytes < 1024) return bytes + ' B';
+  if(bytes < 1048576) return (bytes/1024).toFixed(1) + ' KB';
+  if(bytes < 1073741824) return (bytes/1048576).toFixed(1) + ' MB';
+  return (bytes/1073741824).toFixed(2) + ' GB';
+}
+function extOf(name){
+  const m = /\.([a-z0-9]+)$/i.exec(name);
+  return m ? m[1].toLowerCase() : '';
+}
+function baseName(name){
+  return name.replace(/\.[^.]+$/, '');
+}
+function escXml(s){
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&apos;');
+}
+function setStatus(msg){ $('#progressText').textContent = msg; }
+function setProgress(frac){
+  frac = Math.max(0, Math.min(1, frac || 0));
+  $('#progressBar').style.width = Math.round(frac*100) + '%';
+  $('#progressPct').textContent = Math.round(frac*100) + '%';
+}
+function showProgress(on){
+  $('#progressWrap').className = 'progress-wrap' + (on ? ' show' : '');
+  if(on){ setProgress(0); setStatus('Working…'); }
+}
+function canvasToBlob(canvas, mime, q){
+  return new Promise(res => canvas.toBlob(res, mime, q));
+}
+function downloadBlob(blob, name){
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href), 4000);
+}
+
+/* ---------- image decoding / canvas ---------- */
+async function decodeImage(rec){
+  let file = rec.file;
+  if(rec.ext === 'tiff' || rec.ext === 'tif'){
+    await loadScript(CDN.utif);
+    const buf = await rec.file.arrayBuffer();
+    const ifds = UTIF.decode(buf);
+    if(!ifds.length) throw new Error('Could not read this TIFF file.');
+    UTIF.decodeImage(buf, ifds[0]);
+    const rgba = UTIF.toRGBA8(ifds[0]);
+    const c = document.createElement('canvas');
+    c.width = ifds[0].width; c.height = ifds[0].height;
+    c.getContext('2d').putImageData(new ImageData(new Uint8ClampedArray(rgba), c.width, c.height), 0, 0);
+    return c;
+  }
+  if(rec.ext === 'heic'){
+    await loadScript(CDN.heic2any);
+    file = await heic2any({ blob: file, toType: 'image/png' });
+  }
+  const url = URL.createObjectURL(file);
+  try{
+    const img = await new Promise((res, rej)=>{
+      const i = new Image();
+      i.onload = ()=>res(i);
+      i.onerror = ()=>rej(new Error('This image could not be read by the browser.'));
+      i.src = url;
+    });
+    return img;
+  } finally { setTimeout(()=>URL.revokeObjectURL(url), 2000); }
+}
+function imageToCanvas(img, flattenWhite, maxDim){
+  maxDim = maxDim || 4096;
+  let w = img.naturalWidth || img.width || 1024, h = img.naturalHeight || img.height || 1024;
+  const big = Math.max(w, h);
+  if(big > maxDim){ const s = maxDim/big; w = Math.round(w*s); h = Math.round(h*s); }
+  const canvas = document.createElement('canvas');
+  canvas.width = w; canvas.height = h;
+  const ctx = canvas.getContext('2d');
+  if(flattenWhite){ ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, w, h); }
+  ctx.drawImage(img, 0, 0, w, h);
+  return canvas;
+}
+function encodeBMP(canvas){
+  const w = canvas.width, h = canvas.height;
+  const data = canvas.getContext('2d').getImageData(0, 0, w, h).data;
+  const rowSize = Math.floor((w*24 + 31)/32)*4;
+  const imgSize = rowSize*h, fileSize = 54 + imgSize;
+  const buf = new ArrayBuffer(fileSize);
+  const dv = new DataView(buf);
+  dv.setUint16(0, 0x4D42, true);           // "BM"
+  dv.setUint32(2, fileSize, true);
+  dv.setUint32(10, 54, true);              // pixel data offset
+  dv.setUint32(14, 40, true);              // BITMAPINFOHEADER
+  dv.setInt32(18, w, true); dv.setInt32(22, h, true);
+  dv.setUint16(26, 1, true);               // planes
+  dv.setUint16(28, 24, true);              // bits
+  dv.setUint32(34, imgSize, true);
+  dv.setUint32(38, 2835, true); dv.setUint32(42, 2835, true);
+  for(let y = h-1; y >= 0; y--){
+    const rowStart = 54 + rowSize*(h-1-y);
+    for(let x = 0; x < w; x++){
+      const i = (y*w + x)*4;
+      const o = rowStart + x*3;
+      dv.setUint8(o, data[i+2]); dv.setUint8(o+1, data[i+1]); dv.setUint8(o+2, data[i]);
+    }
+  }
+  return new Blob([buf], {type:'image/bmp'});
+}
+async function encodeICO(canvas){
+  const pngBlob = await canvasToBlob(canvas, 'image/png');
+  const pngBytes = new Uint8Array(await pngBlob.arrayBuffer());
+  const buf = new Uint8Array(22 + pngBytes.length);
+  const dv = new DataView(buf.buffer);
+  dv.setUint16(0, 0, true); dv.setUint16(2, 1, true); dv.setUint16(4, 1, true);
+  buf[6] = canvas.width >= 256 ? 0 : canvas.width;
+  buf[7] = canvas.height >= 256 ? 0 : canvas.height;
+  dv.setUint16(10, 1, true); dv.setUint16(12, 32, true);
+  dv.setUint32(14, pngBytes.length, true); dv.setUint32(18, 22, true);
+  buf.set(pngBytes, 22);
+  return new Blob([buf], {type:'image/x-icon'});
+}
+
+/* ---------- jsPDF text helper ---------- */
+async function textToPdfBlob(text, title){
+  await loadScript(CDN.jspdf);
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({unit:'pt', format:'a4'});
+  const margin = 48, maxW = 595.28 - margin*2;
+  let y = margin + 10;
+  doc.setFont('helvetica','bold'); doc.setFontSize(14);
+  if(title){ doc.text(title.slice(0, 80), margin, y); y += 22; }
+  doc.setFont('helvetica','normal'); doc.setFontSize(10.5);
+  const lines = doc.splitTextToSize(text || '(empty)', maxW);
+  for(const line of lines){
+    if(y > 841.89 - margin){ doc.addPage(); y = margin; }
+    doc.text(line, margin, y);
+    y += 14;
+  }
+  return doc.output('blob');
+}
+
+/* ---------- minimal DOCX writer ---------- */
+async function buildDocx(text, title){
+  await loadScript(CDN.jszip);
+  const zip = new JSZip();
+  zip.file('[Content_Types].xml',
+    '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+    '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">' +
+    '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>' +
+    '<Default Extension="xml" ContentType="application/xml"/>' +
+    '<Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>' +
+    '</Types>');
+  zip.file('_rels/.rels',
+    '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+    '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' +
+    '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>' +
+    '</Relationships>');
+  const paras = (text || '').split(/\r?\n/).map(line =>
+    '<w:p><w:r><w:t xml:space="preserve">' + escXml(line) + '</w:t></w:r></w:p>').join('');
+  const titlePara = title ? ('<w:p><w:pPr><w:rPr><w:b/><w:sz w:val="32"/></w:rPr></w:pPr><w:r><w:rPr><w:b/><w:sz w:val="32"/></w:rPr><w:t xml:space="preserve">' + escXml(title) + '</w:t></w:r></w:p>') : '';
+  zip.file('word/document.xml',
+    '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+    '<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>' +
+    titlePara + paras +
+    '</w:body></w:document>');
+  return await zip.generateAsync({type:'blob'});
+}
+
+/* ---------- RTF ---------- */
+function buildRtf(text){
+  const escRtf = t => String(t)
+    .replace(/\\/g, '\\\\').replace(/\{/g, '\\{').replace(/\}/g, '\\}')
+    .replace(/[^\x00-\x7f]/g, c => '\\u' + c.charCodeAt(0) + '?');
+  const lines = (text || '').split(/\r?\n/).map(l => escRtf(l) + '\\par');
+  return new Blob(['{\\rtf1\\ansi\\deff0{\\fonttbl{\\f0 Arial;}}\\fs22\n' + lines.join('\n') + '\n}'], {type: 'application/rtf'});
+}
+
+/* ---------- ODT ---------- */
+async function buildOdt(text, title){
+  await loadScript(CDN.jszip);
+  const zip = new JSZip();
+  zip.file('mimetype', 'application/vnd.oasis.opendocument.text', {compression: 'STORE'});
+  zip.file('META-INF/manifest.xml',
+    '<?xml version="1.0" encoding="UTF-8"?>'
+    + '<manifest:manifest xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0" manifest:version="1.2">'
+    + '<manifest:file-entry manifest:full-path="/" manifest:media-type="application/vnd.oasis.opendocument.text"/>'
+    + '<manifest:file-entry manifest:full-path="content.xml" manifest:media-type="text/xml"/>'
+    + '<manifest:file-entry manifest:full-path="styles.xml" manifest:media-type="text/xml"/>'
+    + '</manifest:manifest>');
+  const titleP = title ? '<text:p text:style-name="Heading">' + escXml(title) + '</text:p>' : '';
+  const paras = (text || '').split(/\r?\n/).map(l => '<text:p>' + escXml(l) + '</text:p>').join('');
+  zip.file('content.xml',
+    '<?xml version="1.0" encoding="UTF-8"?>'
+    + '<office:document-content xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" office:version="1.2">'
+    + '<office:body><office:text>' + titleP + paras + '</office:text></office:body></office:document-content>');
+  zip.file('styles.xml',
+    '<?xml version="1.0" encoding="UTF-8"?>'
+    + '<office:document-styles xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" office:version="1.2"><office:styles/></office:document-styles>');
+  return await zip.generateAsync({type: 'blob'});
+}
+
+/* ---------- EPUB ---------- */
+async function buildEpub(chapters, title){
+  await loadScript(CDN.jszip);
+  const zip = new JSZip();
+  zip.file('mimetype', 'application/epub+zip', {compression: 'STORE'});
+  zip.file('META-INF/container.xml',
+    '<?xml version="1.0" encoding="UTF-8"?>'
+    + '<container version="1.0" xmlns="urn:oasis:names:tc:opendocument:xmlns:container">'
+    + '<rootfiles><rootfile full-path="OEBPS/content.opf" media-type="application/oebps-package+xml"/></rootfiles></container>');
+  chapters = (chapters && chapters.length ? chapters : [{title: 'Content', body: '(empty)'}]);
+  let manifest = '<item id="ncx" href="toc.ncx" media-type="application/x-dtbncx+xml"/>';
+  let spine = '', nav = '';
+  chapters.forEach((ch, i) => {
+    const id = 'ch' + (i + 1);
+    manifest += '<item id="' + id + '" href="' + id + '.xhtml" media-type="application/xhtml+xml"/>';
+    spine += '<itemref idref="' + id + '"/>';
+    nav += '<navPoint id="nav' + (i + 1) + '" playOrder="' + (i + 1) + '"><navLabel><text>'
+      + escXml(ch.title || ('Section ' + (i + 1))) + '</text></navLabel><content src="' + id + '.xhtml"/></navPoint>';
+    const paras = String(ch.body || '').split(/\n/).map(p => '<p>' + escXml(p) + '</p>').join('');
+    const h = ch.title ? '<h2>' + escXml(ch.title) + '</h2>' : '';
+    zip.file('OEBPS/' + id + '.xhtml',
+      '<?xml version="1.0" encoding="UTF-8"?>'
+      + '<!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml"><head><title>'
+      + escXml(ch.title || title || 'Chapter') + '</title></head>'
+      + '<body>' + h + paras + '</body></html>');
+  });
+  const uid = 'urn:uuid:' + (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()));
+  zip.file('OEBPS/content.opf',
+    '<?xml version="1.0" encoding="UTF-8"?>'
+    + '<package xmlns="http://www.idpf.org/2007/opf" unique-identifier="bookid" version="2.0">'
+    + '<metadata xmlns:dc="http://purl.org/dc/elements/1.1/">'
+    + '<dc:title>' + escXml(title || 'Converted Document') + '</dc:title>'
+    + '<dc:creator>Convert IT</dc:creator><dc:language>en</dc:language>'
+    + '<dc:identifier id="bookid">' + uid + '</dc:identifier>'
+    + '</metadata><manifest>' + manifest + '</manifest>'
+    + '<spine toc="ncx">' + spine + '</spine></package>');
+  zip.file('OEBPS/toc.ncx',
+    '<?xml version="1.0" encoding="UTF-8"?>'
+    + '<ncx xmlns="http://www.daisy.org/z3986/2005/ncx/" version="2005-1">'
+    + '<head><meta name="dtb:uid" content="' + uid + '"/></head>'
+    + '<docTitle><text>' + escXml(title || 'Book') + '</text></docTitle>'
+    + '<navMap>' + nav + '</navMap></ncx>');
+  return await zip.generateAsync({type: 'blob', mimeType: 'application/epub+zip'});
+}
+
+/* ---------- EPS (raster) ---------- */
+function epsFromCanvas(canvas){
+  const w = canvas.width, h = canvas.height;
+  const data = canvas.getContext('2d').getImageData(0, 0, w, h).data;
+  let hex = '';
+  for(let i = 0; i < data.length; i += 4){
+    hex += data[i].toString(16).padStart(2, '0')
+         + data[i+1].toString(16).padStart(2, '0')
+         + data[i+2].toString(16).padStart(2, '0');
+  }
+  let hexLines = '';
+  for(let i = 0; i < hex.length; i += 72) hexLines += hex.slice(i, i + 72) + '\n';
+  return new Blob([
+    '%!PS-Adobe-3.0 EPSF-3.0\n'
+    + '%%Creator: Convert IT\n'
+    + '%%BoundingBox: 0 0 ' + w + ' ' + h + '\n'
+    + '%%EndComments\n'
+    + '/picstr ' + (w * 3) + ' string def\n'
+    + w + ' ' + h + ' 8\n'
+    + '[' + w + ' 0 0 -' + h + ' 0 ' + h + ']\n'
+    + '{currentfile picstr readhexstring pop}\n'
+    + 'false 3 colorimage\n'
+    + hexLines
+    + '%%EOF\n'
+  ], {type: 'application/postscript'});
+}
+
+/* ---------- text -> page canvases (for DOCX/PPTX to JPG/PNG) ---------- */
+function textPagesToCanvases(lines){
+  const wPx = 1240, hPx = 1754, margin = 96, maxW = wPx - margin * 2;
+  const pages = [];
+  let canvas = null, ctx = null, y = 0;
+  const newPage = () => {
+    canvas = document.createElement('canvas');
+    canvas.width = wPx; canvas.height = hPx;
+    ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, wPx, hPx);
+    ctx.fillStyle = '#111827';
+    ctx.font = '500 30px Arial, sans-serif';
+    ctx.textBaseline = 'top';
+    y = margin;
+    pages.push(canvas);
+  };
+  newPage();
+  for(const line of lines){
+    const words = String(line).split(' ');
+    const wrapped = [];
+    let cur = '';
+    for(const wd of words){
+      const t = cur ? cur + ' ' + wd : wd;
+      if(ctx.measureText(t).width > maxW && cur){ wrapped.push(cur); cur = wd; }
+      else cur = t;
+    }
+    wrapped.push(cur);
+    for(const seg of wrapped){
+      if(y > hPx - margin){ newPage(); }
+      ctx.fillText(seg, margin, y);
+      y += 42;
+    }
+  }
+  return pages;
+}
+
+/* ---------- PPTX text extraction + slide render ---------- */
+async function pptxToSlideTexts(file){
+  await loadScript(CDN.jszip);
+  const zip = await JSZip.loadAsync(await file.arrayBuffer());
+  const names = Object.keys(zip.files)
+    .filter(n => /^ppt\/slides\/slide\d+\.xml$/.test(n))
+    .sort((a, b) => parseInt(a.match(/\d+/)[0], 10) - parseInt(b.match(/\d+/)[0], 10));
+  const slides = [];
+  for(const n of names){
+    const xml = await zip.file(n).async('string');
+    const doc = new DOMParser().parseFromString(xml, 'application/xml');
+    const paras = [...doc.getElementsByTagName('a:p')].map(p =>
+      [...p.getElementsByTagName('a:t')].map(t => t.textContent).join('')).filter(Boolean);
+    slides.push(paras);
+  }
+  return slides;
+}
+function slideTextToCanvas(paras){
+  const W = 1280, H = 720;
+  const canvas = document.createElement('canvas');
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, W, H);
+  ctx.fillStyle = '#111827';
+  ctx.textBaseline = 'top';
+  let y = 64;
+  paras.slice(0, 14).forEach((p, i) => {
+    ctx.font = i === 0 ? '700 44px Arial, sans-serif' : '400 28px Arial, sans-serif';
+    const lh = i === 0 ? 54 : 38;
+    const words = String(p).split(' ');
+    let cur = '';
+    for(const wd of words){
+      const t = cur ? cur + ' ' + wd : wd;
+      if(ctx.measureText(t).width > (W - 128) && cur){ ctx.fillText(cur, 64, y); y += lh; cur = wd; }
+      else cur = t;
+    }
+    if(cur){ ctx.fillText(cur, 64, y); y += lh; }
+    y += 12;
+  });
+  return canvas;
+}
+
+/* ---------- PPTX writer (image slides) ---------- */
+async function buildPptx(images){
+  await loadScript(CDN.jszip);
+  const zip = new JSZip();
+  const A = 'http://schemas.openxmlformats.org/drawingml/2006/main';
+  const R = 'http://schemas.openxmlformats.org/officeDocument/2006/relationships';
+  const P = 'http://schemas.openxmlformats.org/presentationml/2006/main';
+  const SLIDE_W = 12192000, SLIDE_H = 6858000;
+  let ct = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+    + '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'
+    + '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>'
+    + '<Default Extension="xml" ContentType="application/xml"/>'
+    + '<Default Extension="png" ContentType="image/png"/>'
+    + '<Override PartName="/ppt/presentation.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.presentation.main+xml"/>'
+    + '<Override PartName="/ppt/slideMasters/slideMaster1.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.slideMaster+xml"/>'
+    + '<Override PartName="/ppt/slideLayouts/slideLayout1.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.slideLayout+xml"/>'
+    + '<Override PartName="/ppt/theme/theme1.xml" ContentType="application/vnd.openxmlformats-officedocument.theme+xml"/>';
+  let presRels = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+    + '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+    + '<Relationship Id="rId1" Type="' + R + '/slideMaster" Target="slideMasters/slideMaster1.xml"/>'
+    + '<Relationship Id="rId2" Type="' + R + '/theme" Target="theme/theme1.xml"/>';
+  let sldIds = '';
+  images.forEach((img, i) => {
+    const id = i + 1;
+    ct += '<Override PartName="/ppt/slides/slide' + id + '.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.slide+xml"/>';
+    presRels += '<Relationship Id="rId' + (id + 2) + '" Type="' + R + '/slide" Target="slides/slide' + id + '.xml"/>';
+    sldIds += '<p:sldId id="' + (255 + id) + '" r:id="rId' + (id + 2) + '"/>';
+    zip.file('ppt/media/image' + id + '.png', img.blob);
+    zip.file('ppt/slides/_rels/slide' + id + '.xml.rels',
+      '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+      + '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+      + '<Relationship Id="rId1" Type="' + R + '/image" Target="../media/image' + id + '.png"/></Relationships>');
+    const ratio = (img.w || 16) / (img.h || 9);
+    let cx = SLIDE_W, cy = Math.round(SLIDE_W / ratio);
+    if(cy > SLIDE_H){ cy = SLIDE_H; cx = Math.round(SLIDE_H * ratio); }
+    const x = Math.round((SLIDE_W - cx) / 2), yy = Math.round((SLIDE_H - cy) / 2);
+    zip.file('ppt/slides/slide' + id + '.xml',
+      '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+      + '<p:sld xmlns:a="' + A + '" xmlns:r="' + R + '" xmlns:p="' + P + '">'
+      + '<p:cSld><p:spTree>'
+      + '<p:nvGrpSpPr><p:cNvPr id="1" name=""/><p:cNvGrpSpPr/><p:nvPr/></p:nvGrpSpPr><p:grpSpPr/>'
+      + '<p:pic><p:nvPicPr><p:cNvPr id="2" name="Picture ' + id + '"/><p:cNvPicPr/><p:nvPr/></p:nvPicPr>'
+      + '<p:blipFill><a:blip r:embed="rId1"/><a:stretch><a:fillRect/></a:stretch></p:blipFill>'
+      + '<p:spPr><a:xfrm><a:off x="' + x + '" y="' + yy + '"/><a:ext cx="' + cx + '" cy="' + cy + '"/></a:xfrm>'
+      + '<a:prstGeom prst="rect"><a:avLst/></a:prstGeom></p:spPr></p:pic>'
+      + '</p:spTree></p:cSld><p:clrMapOvr><a:masterClrMapping/></p:clrMapOvr></p:sld>');
+  });
+  ct += '</Types>';
+  zip.file('[Content_Types].xml', ct);
+  zip.file('_rels/.rels',
+    '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+    + '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+    + '<Relationship Id="rId1" Type="' + R + '/officeDocument" Target="ppt/presentation.xml"/></Relationships>');
+  zip.file('ppt/presentation.xml',
+    '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+    + '<p:presentation xmlns:a="' + A + '" xmlns:r="' + R + '" xmlns:p="' + P + '">'
+    + '<p:sldMasterIdLst><p:sldMasterId id="2147483648" r:id="rId1"/></p:sldMasterIdLst>'
+    + '<p:sldIdLst>' + sldIds + '</p:sldIdLst>'
+    + '<p:sldSz cx="' + SLIDE_W + '" cy="' + SLIDE_H + '"/><p:notesSz cx="6858000" cy="9144000"/></p:presentation>');
+  presRels += '</Relationships>';
+  zip.file('ppt/_rels/presentation.xml.rels', presRels);
+  const spTree = '<p:spTree><p:nvGrpSpPr><p:cNvPr id="1" name=""/><p:cNvGrpSpPr/><p:nvPr/></p:nvGrpSpPr><p:grpSpPr/></p:spTree>';
+  zip.file('ppt/slideMasters/slideMaster1.xml',
+    '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+    + '<p:sldMaster xmlns:a="' + A + '" xmlns:r="' + R + '" xmlns:p="' + P + '">'
+    + '<p:cSld>' + spTree + '</p:cSld>'
+    + '<p:clrMap bg1="lt1" tx1="dk1" bg2="lt2" tx2="dk2" accent1="accent1" accent2="accent2" accent3="accent3" accent4="accent4" accent5="accent5" accent6="accent6" hlink="hlink" folHlink="folHlink"/>'
+    + '<p:sldLayoutIdLst><p:sldLayoutId id="2147483649" r:id="rId1"/></p:sldLayoutIdLst></p:sldMaster>');
+  zip.file('ppt/slideMasters/_rels/slideMaster1.xml.rels',
+    '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+    + '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+    + '<Relationship Id="rId1" Type="' + R + '/slideLayout" Target="../slideLayouts/slideLayout1.xml"/>'
+    + '<Relationship Id="rId2" Type="' + R + '/theme" Target="../theme/theme1.xml"/></Relationships>');
+  zip.file('ppt/slideLayouts/slideLayout1.xml',
+    '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+    + '<p:sldLayout xmlns:a="' + A + '" xmlns:r="' + R + '" xmlns:p="' + P + '" type="blank" preserve="1">'
+    + '<p:cSld name="Blank">' + spTree + '</p:cSld>'
+    + '<p:clrMapOvr><a:masterClrMapping/></p:clrMapOvr></p:sldLayout>');
+  zip.file('ppt/slideLayouts/_rels/slideLayout1.xml.rels',
+    '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+    + '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+    + '<Relationship Id="rId1" Type="' + R + '/slideMaster" Target="../slideMasters/slideMaster1.xml"/></Relationships>');
+  zip.file('ppt/theme/theme1.xml',
+    '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+    + '<a:theme xmlns:a="' + A + '" name="ConvertIT"><a:themeElements>'
+    + '<a:clrScheme name="Office"><a:dk1><a:sysClr val="windowText" lastClr="000000"/></a:dk1>'
+    + '<a:lt1><a:sysClr val="window" lastClr="FFFFFF"/></a:lt1>'
+    + '<a:dk2><a:srgbClr val="44546A"/></a:dk2><a:lt2><a:srgbClr val="E7E6E6"/></a:lt2>'
+    + '<a:accent1><a:srgbClr val="4472C4"/></a:accent1><a:accent2><a:srgbClr val="ED7D31"/></a:accent2>'
+    + '<a:accent3><a:srgbClr val="A5A5A5"/></a:accent3><a:accent4><a:srgbClr val="FFC000"/></a:accent4>'
+    + '<a:accent5><a:srgbClr val="5B9BD5"/></a:accent5><a:accent6><a:srgbClr val="70AD47"/></a:accent6>'
+    + '<a:hlink><a:srgbClr val="0563C1"/></a:hlink><a:folHlink><a:srgbClr val="954F72"/></a:folHlink></a:clrScheme>'
+    + '<a:fontScheme name="Office"><a:majorFont><a:latin typeface="Calibri Light"/><a:ea typeface=""/><a:cs typeface=""/></a:majorFont>'
+    + '<a:minorFont><a:latin typeface="Calibri"/><a:ea typeface=""/><a:cs typeface=""/></a:minorFont></a:fontScheme>'
+    + '<a:fmtScheme name="Office"><a:fillStyleLst><a:solidFill><a:schemeClr val="phClr"/></a:solidFill>'
+    + '<a:solidFill><a:schemeClr val="phClr"/></a:solidFill><a:solidFill><a:schemeClr val="phClr"/></a:solidFill></a:fillStyleLst>'
+    + '<a:lnStyleLst><a:ln><a:solidFill><a:schemeClr val="phClr"/></a:solidFill></a:ln>'
+    + '<a:ln><a:solidFill><a:schemeClr val="phClr"/></a:solidFill></a:ln>'
+    + '<a:ln><a:solidFill><a:schemeClr val="phClr"/></a:solidFill></a:ln></a:lnStyleLst>'
+    + '<a:effectStyleLst><a:effectStyle><a:effectLst/></a:effectStyle><a:effectStyle><a:effectLst/></a:effectStyle>'
+    + '<a:effectStyle><a:effectLst/></a:effectStyle></a:effectStyleLst>'
+    + '<a:bgFillStyleLst><a:solidFill><a:schemeClr val="phClr"/></a:solidFill>'
+    + '<a:solidFill><a:schemeClr val="phClr"/></a:solidFill><a:solidFill><a:schemeClr val="phClr"/></a:solidFill></a:bgFillStyleLst>'
+    + '</a:fmtScheme></a:themeElements></a:theme>');
+  return await zip.generateAsync({type: 'blob', mimeType: 'application/vnd.openxmlformats-officedocument.presentationml.presentation'});
+}
+
+/* ---------- GIF decoding (own LZW decoder, frame by frame) ---------- */
+function gifLzw(minCodeSize, data, pixelCount){
+  const clearCode = 1 << minCodeSize, eoiCode = clearCode + 1, MAX = 4096;
+  let codeSize = minCodeSize + 1, dictLen = eoiCode + 1;
+  let dict = [];
+  const reset = () => {
+    dict = new Array(MAX);
+    for(let i = 0; i < clearCode; i++) dict[i] = [i];
+    dictLen = eoiCode + 1;
+    codeSize = minCodeSize + 1;
+  };
+  reset();
+  const out = [];
+  let bitPos = 0, prev = null;
+  const totalBits = data.length * 8;
+  while(out.length < pixelCount){
+    if(bitPos + codeSize > totalBits) break;
+    let code = 0;
+    for(let i = 0; i < codeSize; i++){
+      code |= ((data[bitPos >> 3] >> (bitPos & 7)) & 1) << i;
+      bitPos++;
+    }
+    if(code === clearCode){ reset(); prev = null; continue; }
+    if(code === eoiCode) break;
+    let entry;
+    if(code < dictLen && dict[code]) entry = dict[code];
+    else if(prev) entry = prev.concat(prev[0]);
+    else break;
+    for(let k = 0; k < entry.length; k++) out.push(entry[k]);
+    if(prev !== null && dictLen < MAX){
+      dict[dictLen++] = prev.concat(entry[0]);
+      if(dictLen === (1 << codeSize) && codeSize < 12) codeSize++;
+    }
+    prev = entry;
+  }
+  return out;
+}
+function decodeGifFrames(buffer){
+  const u8 = new Uint8Array(buffer);
+  if(u8[0] !== 0x47 || u8[1] !== 0x49 || u8[2] !== 0x46) throw new Error('Not a valid GIF file.');
+  let p = 6;
+  const u16 = () => { const v = u8[p] | (u8[p + 1] << 8); p += 2; return v; };
+  const width = u16(), height = u16();
+  const flags0 = u8[p++];
+  p++; p++;
+  let gct = null;
+  if(flags0 & 0x80){ const n = 3 * (2 << (flags0 & 7)); gct = u8.subarray(p, p + n); p += n; }
+  const frames = [];
+  let disposal = 0, transparentIdx = -1;
+  while(p < u8.length){
+    const b = u8[p++];
+    if(b === 0x3B) break;
+    if(b === 0x21){
+      const label = u8[p++];
+      if(label === 0xF9){
+        p++;
+        const f = u8[p++];
+        p += 2;
+        transparentIdx = (f & 1) ? u8[p] : -1;
+        p++;
+        disposal = (f >> 2) & 7;
+        p++;
+      } else {
+        while(p < u8.length && u8[p] !== 0) p += u8[p] + 1;
+        p++;
+      }
+    } else if(b === 0x2C){
+      const left = u16(), top = u16(), w = u16(), h = u16();
+      const f = u8[p++];
+      let lct = null;
+      if(f & 0x80){ const n = 3 * (2 << (f & 7)); lct = u8.subarray(p, p + n); p += n; }
+      const interlaced = !!(f & 0x40);
+      const minCode = u8[p++];
+      const data = [];
+      while(p < u8.length && u8[p] !== 0){
+        const len = u8[p++];
+        for(let i = 0; i < len; i++) data.push(u8[p++]);
+      }
+      p++;
+      const palette = lct || gct;
+      if(!palette) throw new Error('GIF has no color palette.');
+      let indices = gifLzw(minCode, data, w * h);
+      if(interlaced){
+        const fixed = new Array(w * h);
+        let from = 0;
+        for(const [start, step] of [[0, 8], [4, 8], [2, 4], [1, 2]]){
+          for(let row = start; row < h; row += step){
+            for(let x = 0; x < w; x++) fixed[row * w + x] = indices[from++];
+          }
+        }
+        indices = fixed;
+      }
+      const rgba = new Uint8ClampedArray(w * h * 4);
+      for(let i = 0; i < w * h; i++){
+        const idx = indices[i];
+        if(idx === transparentIdx){ rgba[i * 4 + 3] = 0; continue; }
+        rgba[i * 4] = palette[idx * 3] || 0;
+        rgba[i * 4 + 1] = palette[idx * 3 + 1] || 0;
+        rgba[i * 4 + 2] = palette[idx * 3 + 2] || 0;
+        rgba[i * 4 + 3] = 255;
+      }
+      frames.push({left, top, width: w, height: h, rgba, disposal});
+    }
+  }
+  if(!frames.length) throw new Error('No frames found in this GIF.');
+  return {width, height, frames};
+}
+async function gifToFrames(rec, outExt){
+  const gif = decodeGifFrames(await rec.file.arrayBuffer());
+  const base = baseName(rec.file.name);
+  const comp = document.createElement('canvas');
+  comp.width = gif.width; comp.height = gif.height;
+  const cctx = comp.getContext('2d');
+  const results = [];
+  for(let i = 0; i < gif.frames.length; i++){
+    const f = gif.frames[i];
+    if(f.disposal === 2) cctx.clearRect(f.left, f.top, f.width, f.height);
+    const pc = document.createElement('canvas');
+    pc.width = f.width; pc.height = f.height;
+    pc.getContext('2d').putImageData(new ImageData(f.rgba, f.width, f.height), 0, 0);
+    cctx.drawImage(pc, f.left, f.top);
+    const snap = document.createElement('canvas');
+    snap.width = gif.width; snap.height = gif.height;
+    if(outExt === 'jpg'){
+      const sctx = snap.getContext('2d');
+      sctx.fillStyle = '#ffffff'; sctx.fillRect(0, 0, gif.width, gif.height);
+      sctx.drawImage(comp, 0, 0);
+    } else {
+      snap.getContext('2d').drawImage(comp, 0, 0);
+    }
+    const blob = await canvasToBlob(snap, outExt === 'jpg' ? 'image/jpeg' : 'image/png', outExt === 'jpg' ? 0.92 : undefined);
+    results.push({ name: base + '_frame' + String(i + 1).padStart(2, '0') + '.' + outExt, blob });
+    setProgress((i + 1) / gif.frames.length);
+    setStatus('Extracted frame ' + (i + 1) + ' of ' + gif.frames.length + '…');
+  }
+  return results;
+}
+
+/* ---------- ffmpeg engine ---------- */
+let _ff = null;
+async function getFF(){
+  if(_ff) return _ff;
+  setStatus('Loading conversion engine (one-time, ~25 MB)…');
+  const workerURL = URL.createObjectURL(
+    new Blob([await (await fetch(CDN.ffmpegWorker)).blob()], {type:'text/javascript'}));
+  const client = {
+    _worker: new Worker(workerURL),
+    _id: 0,
+    _pending: new Map(),
+    onprogress: null,
+    onlog: null
+  };
+  client._worker.onmessage = ({data}) => {
+    if(data.type === 'PROGRESS'){
+      if(client.onprogress && data.data && data.data.progress > 0 && data.data.progress <= 1)
+        setProgress(data.data.progress);
+      return;
+    }
+    if(data.type === 'LOG'){
+      if(client.onlog) client.onlog(data.data);
+      return;
+    }
+    const p = client._pending.get(data.id);
+    if(!p) return;
+    client._pending.delete(data.id);
+    if(data.type === 'ERROR') p.reject(new Error(String(data.data)));
+    else p.resolve(data.data);
+  };
+  client.call = (type, data) => new Promise((resolve, reject) => {
+    const id = ++client._id;
+    client._pending.set(id, {resolve, reject});
+    client._worker.postMessage({id, type, data});
+  });
+  client.writeFile = (path, u8) => client.call('WRITE_FILE', {path, data: u8});
+  client.readFile = (path) => client.call('READ_FILE', {path});
+  client.deleteFile = (path) => client.call('DELETE_FILE', {path});
+  client.exec = async (args) => {
+    const ret = await client.call('EXEC', {args, timeout: -1});
+    if(ret !== 0 && ret !== true)
+      throw new Error('Conversion engine could not process this file (exit code ' + ret + '). Try a different quality or format.');
+    return ret;
+  };
+  await client.call('LOAD', {
+    coreURL: CDN.ffmpegCore + '/ffmpeg-core.js',
+    wasmURL: CDN.ffmpegCore + '/ffmpeg-core.wasm'
+  });
+  _ff = client;
+  return client;
+}
+function codecArgs(out, q){
+  const crf = (q === 'best') ? '20' : '26';
+  const aq = (q === 'best') ? '320k' : '192k';
+  switch(out){
+    case 'mp4': return ['-c:v','libx264','-preset','veryfast','-crf',crf,'-pix_fmt','yuv420p','-c:a','aac','-b:a','160k','-movflags','+faststart'];
+    case 'mkv': return ['-c:v','libx264','-preset','veryfast','-crf',crf,'-pix_fmt','yuv420p','-c:a','aac'];
+    case 'mov': return ['-c:v','libx264','-preset','veryfast','-crf',crf,'-pix_fmt','yuv420p','-c:a','aac'];
+    case 'avi': return ['-c:v','mpeg4','-vtag','xvid','-qscale:v', (q==='best')?'4':'6','-c:a','libmp3lame','-b:a',aq];
+    case 'wmv': return ['-c:v','wmv2','-qscale:v', (q==='best')?'4':'6','-c:a','wmav2'];
+    case 'flv': return ['-c:v','flv','-qscale:v', (q==='best')?'4':'6','-c:a','libmp3lame','-b:a',aq];
+    case 'webm': return ['-c:v','libvpx','-crf',crf,'-b:v','1M','-deadline','realtime','-cpu-used','5','-c:a','libvorbis','-q:a','4'];
+    case 'webp': return ['-c:v','libwebp','-lossless','0','-q:v', (q==='best')?'80':'60','-loop','0','-an','-vf','fps=12,scale=640:-2:flags=lanczos'];
+    case 'mp3': return ['-vn','-c:a','libmp3lame','-b:a',aq];
+    case 'wav': return ['-vn'];
+    case 'ogg': return ['-vn','-c:a','libvorbis','-q:a','6'];
+    case 'aac': return ['-vn','-c:a','aac','-b:a', (q==='best')?'256k':'160k'];
+    case 'flac': return ['-vn','-c:a','flac'];
+    case 'm4a': return ['-vn','-c:a','aac','-b:a', (q==='best')?'256k':'160k'];
+    case 'm4r': return ['-vn','-c:a','aac','-b:a', (q==='best')?'256k':'160k'];
+    default: return [];
+  }
+}
+async function ffmpegFile(rec, outExt, opts){
+  const ff = await getFF();
+  const inName = 'input.' + ((rec.ext === 'jpeg') ? 'jpg' : rec.ext);
+  const realOut = (outExt === 'm4r') ? 'm4a' : outExt;
+  const outName = 'output.' + realOut;
+  await ff.writeFile(inName, new Uint8Array(await rec.file.arrayBuffer()));
+
+  let args;
+  if(outExt === 'gif'){
+    args = ['-i', inName, '-t', '10',
+      '-vf','fps=12,scale=640:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse',
+      '-loop','0','-y', outName];
+  } else if((outExt === 'jpg' || outExt === 'png') && VIDEO_EXTS.includes(rec.ext)){
+    /* NOTE: the mjpeg encoder crashes this wasm build, so frames are
+       extracted as PNG first and re-encoded to JPG in a canvas if needed. */
+    const frameArgs = ['-ss', String(opts.frameTime || 0), '-i', inName,
+      '-frames:v','1','-update','1','-y','frame.png'];
+    await ff.exec(frameArgs);
+    const pngData = await ff.readFile('frame.png');
+    await ff.deleteFile('frame.png').catch(()=>{});
+    const pngBlob = new Blob([pngData.buffer], {type:'image/png'});
+    if(outExt === 'png'){
+      return { name: baseName(rec.file.name) + '.png', blob: pngBlob };
+    }
+    const url = URL.createObjectURL(pngBlob);
+    const img = await new Promise((res, rej)=>{
+      const i = new Image();
+      i.onload = ()=>res(i); i.onerror = ()=>rej(new Error('Frame could not be decoded.'));
+      i.src = url;
+    });
+    const canvas = imageToCanvas(img, true);
+    const jpgBlob = await canvasToBlob(canvas, 'image/jpeg', 0.92);
+    URL.revokeObjectURL(url);
+    return { name: baseName(rec.file.name) + '.jpg', blob: jpgBlob };
+  } else {
+    args = ['-i', inName, ...codecArgs(outExt, opts.quality), '-y', outName];
+  }
+  await ff.exec(args);
+  const data = await ff.readFile(outName);
+  if(!data || !data.length) throw new Error('Conversion produced no output — this format pair may not be supported by the engine.');
+  await ff.deleteFile(inName).catch(()=>{});
+  await ff.deleteFile(outName).catch(()=>{});
+  const name = baseName(rec.file.name) + '.' + outExt;
+  return { name, blob: new Blob([data.buffer], {type: MIME[outExt] || 'application/octet-stream'}) };
+}
+async function slideshowFromBlobs(pngBlobs, outExt, dims, onStep){
+  const ff = await getFF();
+  let W = (dims && dims.w) || 1024, H = (dims && dims.h) || 768;
+  W = Math.max(2, Math.round(W / 2) * 2); H = Math.max(2, Math.round(H / 2) * 2);
+  for(let i = 0; i < pngBlobs.length; i++){
+    await ff.writeFile('in' + i + '.png', new Uint8Array(await pngBlobs[i].arrayBuffer()));
+    onStep && onStep(i + 1, pngBlobs.length);
+  }
+  const filters = [];
+  for(let i = 0; i < pngBlobs.length; i++){
+    filters.push('[' + i + ':v]scale=' + W + ':' + H + ':force_original_aspect_ratio=decrease,pad=' + W + ':' + H + ':(ow-iw)/2:(oh-ih)/2,setsar=1,tpad=stop_duration=1.5:stop_mode=clone[v' + i + ']');
+  }
+  const graph = filters.join(';') + ';'
+    + filters.map((_, i) => '[v' + i + ']').join('')
+    + 'concat=n=' + pngBlobs.length + ':v=1:a=0[vout]';
+  const args = [];
+  for(let i = 0; i < pngBlobs.length; i++) args.push('-i', 'in' + i + '.png');
+  if(outExt === 'gif'){
+    args.push('-filter_complex', graph + ';[vout]fps=10,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse[go]');
+    args.push('-map', '[go]', '-loop', '0', '-y', 'out.gif');
+  } else {
+    args.push('-filter_complex', graph);
+    args.push('-map', '[vout]', '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '23', '-pix_fmt', 'yuv420p', '-r', '25', '-y', 'out.mp4');
+  }
+  await ff.exec(args);
+  const data = await ff.readFile('out.' + outExt);
+  for(let i = 0; i < pngBlobs.length; i++) await ff.deleteFile('in' + i + '.png').catch(() => {});
+  await ff.deleteFile('out.' + outExt).catch(() => {});
+  return { name: 'slideshow.' + outExt, blob: new Blob([data.buffer], {type: MIME[outExt] || 'application/octet-stream'}) };
+}
+async function imagesToSlideshow(recs, outExt, opts, onStep){
+  const pngBlobs = [];
+  let first = null;
+  for(const rec of recs){
+    const img = await decodeImage(rec);
+    if(!first) first = img;
+    const canvas = imageToCanvas(img, false);
+    pngBlobs.push(await canvasToBlob(canvas, 'image/png'));
+  }
+  const dims = first ? { w: first.naturalWidth || first.width || 1024, h: first.naturalHeight || first.height || 768 } : null;
+  return await slideshowFromBlobs(pngBlobs, outExt, dims, onStep);
+}
+
+/* ---------- pdf.js helpers ---------- */
+async function pdfDoc(file){
+  await loadScript(CDN.pdfjs);
+  const pdfjsLib = window.pdfjsLib;
+  pdfjsLib.GlobalWorkerOptions.workerSrc = CDN.pdfjsW;
+  return await pdfjsLib.getDocument({ data: new Uint8Array(await file.arrayBuffer()) }).promise;
+}
+async function pdfToText(file){
+  const doc = await pdfDoc(file);
+  let out = '';
+  for(let p = 1; p <= doc.numPages; p++){
+    const page = await doc.getPage(p);
+    const tc = await page.getTextContent();
+    let last = '';
+    for(const item of tc.items){
+      last += item.str + (item.hasEOL ? '\n' : ' ');
+    }
+    out += last.trim() + '\n\n';
+  }
+  return { text: out.trim(), pages: doc.numPages };
+}
+async function pdfToImages(file, outExt, q){
+  const doc = await pdfDoc(file);
+  const results = [];
+  const base = baseName(file.name);
+  for(let p = 1; p <= doc.numPages; p++){
+    setProgress(p/doc.numPages);
+    setStatus('Rendering page ' + p + ' of ' + doc.numPages + '…');
+    const page = await doc.getPage(p);
+    const viewport = page.getViewport({scale: 2});
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.ceil(viewport.width); canvas.height = Math.ceil(viewport.height);
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+    await page.render({ canvasContext: ctx, viewport }).promise;
+    const blob = await canvasToBlob(canvas, outExt === 'jpg' ? 'image/jpeg' : 'image/png', outExt === 'jpg' ? (q==='best'?0.92:0.8) : undefined);
+    results.push({ name: base + '_page' + p + '.' + outExt, blob, w: canvas.width, h: canvas.height });
+  }
+  return results;
+}
+
+/* ---------- mammoth (DOCX) ---------- */
+async function docxToHtmlText(file){
+  await loadScript(CDN.mammoth);
+  const arrayBuffer = await file.arrayBuffer();
+  const result = await window.mammoth.convertToHtml({ arrayBuffer });
+  const div = document.createElement('div');
+  div.innerHTML = result.value;
+  const text = div.innerText || '';
+  return { html: result.value, text };
+}
+
+/* ---------- epub ---------- */
+async function epubToText(file){
+  await loadScript(CDN.jszip);
+  const zip = await JSZip.loadAsync(await file.arrayBuffer());
+  const names = Object.keys(zip.files)
+    .filter(n => /\.(xhtml|html|htm)$/i.test(n) && !zip.files[n].dir)
+    .sort();
+  let full = '';
+  for(const n of names){
+    const html = await zip.file(n).async('string');
+    const div = document.createElement('div');
+    div.innerHTML = html;
+    const t = (div.innerText || '').trim();
+    if(t) full += t + '\n\n';
+  }
+  return full.trim();
+}
+
+/* ---------- OCR ---------- */
+async function ocrText(file){
+  await loadScript(CDN.tesseract);
+  setStatus('Running OCR — reading text from image…');
+  const worker = await Tesseract.createWorker('eng', 1, {
+    logger: m => { if(m.status === 'recognizing text') setProgress(m.progress); }
+  });
+  try{
+    const { data } = await worker.recognize(file);
+    return data.text || '';
+  } finally { await worker.terminate(); }
+}
+
+/* ---------- spreadsheet ---------- */
+function parseCSV(text){
+  const rows = []; let row = [], field = '', inQ = false;
+  for(let i = 0; i < text.length; i++){
+    const c = text[i];
+    if(inQ){
+      if(c === '"'){ if(text[i+1] === '"'){ field += '"'; i++; } else inQ = false; }
+      else field += c;
+    } else {
+      if(c === '"') inQ = true;
+      else if(c === ','){ row.push(field); field = ''; }
+      else if(c === '\n' || c === '\r'){
+        if(c === '\r' && text[i+1] === '\n') i++;
+        row.push(field); rows.push(row); row = []; field = '';
+      } else field += c;
+    }
+  }
+  if(field !== '' || row.length){ row.push(field); rows.push(row); }
+  return rows;
+}
+async function xlsxSheets(file){
+  await loadScript(CDN.xlsx);
+  const wb = XLSX.read(await file.arrayBuffer());
+  return wb.SheetNames.map(n => ({ name: n, csv: XLSX.utils.sheet_to_csv(wb.Sheets[n]) }));
+}
+
+/* ---------- canvas-based image conversion ---------- */
+async function canvasConvert(rec, outExt, opts){
+  const img = await decodeImage(rec);
+  const needsFlatten = (outExt === 'jpg' || outExt === 'bmp' || outExt === 'ico' || outExt === 'pdf' || outExt === 'eps');
+  const flattenWhite = needsFlatten && ALPHA_EXTS.includes(rec.ext) && opts.flatten !== 'keep';
+  const canvas = imageToCanvas(img, flattenWhite);
+  let blob, mime;
+  if(outExt === 'bmp'){ blob = encodeBMP(canvas); mime = 'image/bmp'; }
+  else if(outExt === 'ico'){ blob = await encodeICO(canvas); mime = 'image/x-icon'; }
+  else if(outExt === 'pdf'){
+    await loadScript(CDN.jspdf);
+    const { jsPDF } = window.jspdf;
+    const w = canvas.width*0.75, h = canvas.height*0.75;
+    const doc = new jsPDF({ unit:'pt', format:[w, h], orientation: w > h ? 'l' : 'p' });
+    doc.addImage(canvas.toDataURL('image/jpeg', opts.quality === 'best' ? 0.92 : 0.8), 'JPEG', 0, 0, w, h);
+    blob = doc.output('blob'); mime = 'application/pdf';
+  }
+  else if(outExt === 'tiff'){
+    await loadScript(CDN.utif);
+    const id = canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height);
+    const arr = UTIF.encodeImage(id.data, canvas.width, canvas.height);
+    blob = new Blob([arr], {type: 'image/tiff'}); mime = 'image/tiff';
+  }
+  else if(outExt === 'eps'){
+    blob = epsFromCanvas(canvas); mime = 'application/postscript';
+  }
+  else {
+    mime = outExt === 'jpg' ? 'image/jpeg' : (outExt === 'webp' ? 'image/webp' : 'image/png');
+    blob = await canvasToBlob(canvas, mime, outExt === 'png' ? undefined : (opts.quality === 'best' ? 0.92 : 0.8));
+  }
+  return { name: baseName(rec.file.name) + '.' + outExt, blob };
+}
+async function imagesToPdf(recs, opts, onStep){
+  await loadScript(CDN.jspdf);
+  const { jsPDF } = window.jspdf;
+  let doc = null;
+  for(let i = 0; i < recs.length; i++){
+    const rec = recs[i];
+    const img = await decodeImage(rec);
+    const flattenWhite = ALPHA_EXTS.includes(rec.ext) && opts.flatten !== 'keep';
+    const canvas = imageToCanvas(img, flattenWhite);
+    const w = canvas.width*0.75, h = canvas.height*0.75;
+    const data = canvas.toDataURL('image/jpeg', opts.quality === 'best' ? 0.92 : 0.82);
+    if(!doc){
+      doc = new jsPDF({ unit:'pt', format:[w, h], orientation: w > h ? 'l' : 'p' });
+    } else {
+      doc.addPage([w, h], w > h ? 'l' : 'p');
+    }
+    doc.addImage(data, 'JPEG', 0, 0, w, h);
+    onStep && onStep(i+1, recs.length);
+  }
+  return { name: recs.length === 1 ? baseName(recs[0].file.name) + '.pdf' : 'merged.pdf', blob: doc.output('blob') };
+}
+
+/* ---------- zip ---------- */
+async function zipAll(recs){
+  await loadScript(CDN.jszip);
+  const zip = new JSZip();
+  const used = {};
+  for(const rec of recs){
+    let n = rec.file.name;
+    if(used[n]){ n = baseName(n) + '_' + (used[rec.file.name]) + '.' + rec.ext; }
+    used[rec.file.name] = (used[rec.file.name] || 0) + 1;
+    zip.file(n, rec.file);
+  }
+  const blob = await zip.generateAsync({ type:'blob', compression:'DEFLATE' });
+  return { name: 'convert-it.zip', blob };
+}
+async function unzip(rec){
+  await loadScript(CDN.jszip);
+  const zip = await JSZip.loadAsync(await rec.file.arrayBuffer());
+  const results = [];
+  const names = Object.keys(zip.files).filter(n => !zip.files[n].dir && !n.startsWith('__MACOSX'));
+  if(!names.length) throw new Error('The archive is empty.');
+  for(const n of names.slice(0, 200)){
+    const blob = await zip.file(n).async('blob');
+    results.push({ name: n.split('/').pop(), blob });
+  }
+  if(names.length > 200) toast('Showing the first 200 files of ' + names.length + '.');
+  return results;
+}
+
+/* ---------- per-file conversion dispatch ---------- */
+async function convertOne(rec, outExt, opts){
+  const src = rec.ext;
+  /* images -> raster/pdf formats */
+  /* GIF -> JPG/PNG : extract every frame */
+  if(src === 'gif' && (outExt === 'jpg' || outExt === 'png')){
+    return await gifToFrames(rec, outExt);
+  }
+  if(IMAGE_EXTS.includes(src) && ['png','jpg','webp','bmp','ico','pdf','tiff','eps'].includes(outExt)){
+    return await canvasConvert(rec, outExt, opts);
+  }
+  /* images -> GIF (single image = short gif) */
+  if(IMAGE_EXTS.includes(src) && outExt === 'gif'){
+    return await imagesToSlideshow([rec], 'gif', opts);
+  }
+  /* image -> text/docx via OCR */
+  if(IMAGE_EXTS.includes(src) && (outExt === 'txt' || outExt === 'docx')){
+    const text = await ocrText(rec.file);
+    if(outExt === 'txt') return { name: baseName(rec.file.name) + '.txt', blob: new Blob([text], {type:'text/plain'}) };
+    return { name: baseName(rec.file.name) + '.docx', blob: await buildDocx(text, 'OCR Result') };
+  }
+  /* PDF -> */
+  if(src === 'pdf'){
+    if(outExt === 'txt'){
+      const { text } = await pdfToText(rec.file);
+      return { name: baseName(rec.file.name) + '.txt', blob: new Blob([text], {type:'text/plain'}) };
+    }
+    if(outExt === 'jpg' || outExt === 'png') return await pdfToImages(rec.file, outExt, opts.quality);
+    if(outExt === 'docx'){
+      const { text } = await pdfToText(rec.file);
+      return { name: baseName(rec.file.name) + '.docx', blob: await buildDocx(text, baseName(rec.file.name)) };
+    }
+    if(outExt === 'xlsx'){
+      const { text } = await pdfToText(rec.file);
+      await loadScript(CDN.xlsx);
+      const aoa = text.split('\n').filter(l => l.trim()).map(l => l.split(/\s{2,}/));
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(aoa.length ? aoa : [['(no extractable text)']]), 'Sheet1');
+      return { name: baseName(rec.file.name) + '.xlsx', blob: new Blob([XLSX.write(wb, {bookType: 'xlsx', type: 'array'})], {type: MIME.xlsx}) };
+    }
+    if(outExt === 'pptx'){
+      const pages = await pdfToImages(rec.file, 'png', 'best');
+      return { name: baseName(rec.file.name) + '.pptx', blob: await buildPptx(pages) };
+    }
+    if(outExt === 'epub'){
+      const { text } = await pdfToText(rec.file);
+      const paras = text.split(/\n\n+/).filter(Boolean);
+      return { name: baseName(rec.file.name) + '.epub', blob: await buildEpub(
+        (paras.length ? paras : ['(no extractable text)']).map((t, i) => ({title: 'Page ' + (i + 1), body: t})),
+        baseName(rec.file.name)) };
+    }
+    if(outExt === 'html'){
+      const { text, pages } = await pdfToText(rec.file);
+      const esc = text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      const html = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>' + escXml(baseName(rec.file.name)) +
+        '</title><style>body{font-family:Georgia,serif;max-width:760px;margin:40px auto;padding:0 20px;line-height:1.6}h2{border-bottom:1px solid #ddd;padding-bottom:6px}</style></head><body>' +
+        esc.split('\n\n').map((p, i)=> i < pages ? '<h2>Page ' + (i+1) + '</h2><p>' + p.replace(/\n/g,'<br>') + '</p>' : '<p>' + p.replace(/\n/g,'<br>') + '</p>').join('') +
+        '</body></html>';
+      return { name: baseName(rec.file.name) + '.html', blob: new Blob([html], {type:'text/html'}) };
+    }
+  }
+  /* DOCX -> */
+  if(src === 'docx'){
+    const { html, text } = await docxToHtmlText(rec.file);
+    if(outExt === 'txt') return { name: baseName(rec.file.name) + '.txt', blob: new Blob([text], {type:'text/plain'}) };
+    if(outExt === 'html'){
+      const out = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>' + escXml(baseName(rec.file.name)) + '</title></head><body>' + html + '</body></html>';
+      return { name: baseName(rec.file.name) + '.html', blob: new Blob([out], {type:'text/html'}) };
+    }
+    if(outExt === 'pdf') return { name: baseName(rec.file.name) + '.pdf', blob: await textToPdfBlob(text, baseName(rec.file.name)) };
+    if(outExt === 'odt') return { name: baseName(rec.file.name) + '.odt', blob: await buildOdt(text, baseName(rec.file.name)) };
+    if(outExt === 'rtf') return { name: baseName(rec.file.name) + '.rtf', blob: buildRtf(text) };
+    if(outExt === 'epub') return { name: baseName(rec.file.name) + '.epub', blob: await buildEpub([{title: baseName(rec.file.name), body: text}], baseName(rec.file.name)) };
+    if(outExt === 'jpg' || outExt === 'png'){
+      const canvases = textPagesToCanvases(text.split(/\r?\n/));
+      const out = [];
+      for(let i = 0; i < canvases.length; i++){
+        out.push({ name: baseName(rec.file.name) + '_page' + (i + 1) + '.' + outExt,
+          blob: await canvasToBlob(canvases[i], outExt === 'jpg' ? 'image/jpeg' : 'image/png', outExt === 'jpg' ? 0.92 : undefined) });
+      }
+      return out;
+    }
+  }
+  /* PPTX -> */
+  if(src === 'pptx'){
+    const slides = await pptxToSlideTexts(rec.file);
+    if(!slides.length) throw new Error('No slides with text found in this PPTX.');
+    const canvases = slides.map(slideTextToCanvas);
+    if(outExt === 'jpg' || outExt === 'png'){
+      const out = [];
+      for(let i = 0; i < canvases.length; i++){
+        out.push({ name: baseName(rec.file.name) + '_slide' + (i + 1) + '.' + outExt,
+          blob: await canvasToBlob(canvases[i], outExt === 'jpg' ? 'image/jpeg' : 'image/png', outExt === 'jpg' ? 0.92 : undefined) });
+      }
+      return out;
+    }
+    if(outExt === 'pdf'){
+      await loadScript(CDN.jspdf);
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({unit: 'pt', format: [960, 540], orientation: 'l'});
+      for(let i = 0; i < canvases.length; i++){
+        if(i) doc.addPage([960, 540], 'l');
+        doc.addImage(canvases[i].toDataURL('image/jpeg', 0.9), 'JPEG', 0, 0, 960, 540);
+      }
+      return { name: baseName(rec.file.name) + '.pdf', blob: doc.output('blob') };
+    }
+    if(outExt === 'mp4'){
+      const blobs = [];
+      for(const cv of canvases) blobs.push(await canvasToBlob(cv, 'image/png'));
+      return await slideshowFromBlobs(blobs, 'mp4', {w: 1280, h: 720});
+    }
+  }
+  /* TXT -> */
+  if(src === 'txt'){
+    const text = await rec.file.text();
+    if(outExt === 'pdf') return { name: baseName(rec.file.name) + '.pdf', blob: await textToPdfBlob(text, null) };
+    if(outExt === 'docx') return { name: baseName(rec.file.name) + '.docx', blob: await buildDocx(text, null) };
+  }
+  /* EPUB -> */
+  if(src === 'epub'){
+    const text = await epubToText(rec.file);
+    if(outExt === 'txt') return { name: baseName(rec.file.name) + '.txt', blob: new Blob([text], {type:'text/plain'}) };
+    if(outExt === 'pdf') return { name: baseName(rec.file.name) + '.pdf', blob: await textToPdfBlob(text, baseName(rec.file.name)) };
+    if(outExt === 'docx') return { name: baseName(rec.file.name) + '.docx', blob: await buildDocx(text, baseName(rec.file.name)) };
+  }
+  /* XLSX -> */
+  if(src === 'xlsx' || src === 'xls'){
+    const sheets = await xlsxSheets(rec.file);
+    if(outExt === 'csv' || outExt === 'txt'){
+      const parts = sheets.map(sh => (sheets.length > 1 ? '## ' + sh.name + ' ##\n' : '') + sh.csv);
+      return { name: baseName(rec.file.name) + '.' + outExt, blob: new Blob([parts.join('\n\n')], {type: outExt === 'csv' ? 'text/csv' : 'text/plain'}) };
+    }
+    if(outExt === 'pdf'){
+      const text = sheets.map(sh => (sheets.length > 1 ? 'Sheet: ' + sh.name + '\n' : '') + sh.csv).join('\n\n\n');
+      return { name: baseName(rec.file.name) + '.pdf', blob: await textToPdfBlob(text, baseName(rec.file.name)) };
+    }
+  }
+  /* CSV -> */
+  if(src === 'csv'){
+    const text = await rec.file.text();
+    if(outExt === 'xlsx'){
+      await loadScript(CDN.xlsx);
+      const rows = parseCSV(text);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(rows), 'Sheet1');
+      const out = XLSX.write(wb, { bookType:'xlsx', type:'array' });
+      return { name: baseName(rec.file.name) + '.xlsx', blob: new Blob([out], {type: MIME.xlsx}) };
+    }
+    if(outExt === 'pdf') return { name: baseName(rec.file.name) + '.pdf', blob: await textToPdfBlob(text, baseName(rec.file.name)) };
+  }
+  /* ZIP -> extract */
+  if(src === 'zip' && outExt === 'extract') return await unzip(rec);
+  /* everything else: video/audio/frame targets via ffmpeg */
+  return await ffmpegFile(rec, outExt, opts);
+}
+
+/* ---------- orchestration ---------- */
+async function doConvert(opts){
+  const recs = state.files;
+  const target = state.target;
+  const allImages = recs.every(r => IMAGE_EXTS.includes(r.ext));
+
+  if(target === 'zip') return [await zipAll(recs)];
+
+  if(allImages && target === 'pdf'){
+    setStatus('Merging ' + recs.length + ' image' + (recs.length > 1 ? 's' : '') + ' into one PDF…');
+    const r = await imagesToPdf(recs, opts, (i, n)=>{ setProgress(i/n); setStatus('Processing image ' + i + ' of ' + n + '…'); });
+    return [r];
+  }
+  /* a single animated GIF -> MP4 must go through the engine directly,
+     not the still-image slideshow path */
+  if(allImages && (target === 'gif' || target === 'mp4') &&
+     !(recs.length === 1 && recs[0].ext === 'gif' && target === 'mp4')){
+    setStatus('Building ' + target.toUpperCase() + ' slideshow from ' + recs.length + ' image(s)…');
+    const r = await imagesToSlideshow(recs, target, opts, (i, n)=>{ setProgress(i/n*0.5); setStatus('Preparing image ' + i + ' of ' + n + '…'); });
+    return [r];
+  }
+
+  const results = [];
+  for(let i = 0; i < recs.length; i++){
+    setStatus('Converting ' + recs[i].file.name + ' (' + (i+1) + ' of ' + recs.length + ')…');
+    setProgress(i/recs.length);
+    const r = await convertOne(recs[i], target, opts);
+    if(Array.isArray(r)) results.push(...r);
+    else results.push(r);
+  }
+  setProgress(1);
+  return results;
+}
+
+/* ---------- UI: files ---------- */
+function addFiles(fileList){
+  const ok = [];
+  for(const f of fileList){
+    const ext = extOf(f.name);
+    if(!ext){ toast('Skipping "' + f.name + '" — no file extension.', true); continue; }
+    if(!REG[ext]){ toast('.' + ext.toUpperCase() + ' files are not supported yet. Skipping "' + f.name + '".', true); continue; }
+    ok.push({ file: f, ext });
+  }
+  state.files.push(...ok);
+  state.target = null;
+  renderFiles();
+  renderTargets();
+}
+function renderFiles(){
+  const list = $('#fileList');
+  list.innerHTML = '';
+  for(const rec of state.files){
+    const chip = document.createElement('div');
+    chip.className = 'file-chip';
+    if(IMAGE_EXTS.includes(rec.ext) && rec.file.size < 8*1024*1024 && !['heic','tiff','tif'].includes(rec.ext)){
+      const img = document.createElement('img');
+      img.src = URL.createObjectURL(rec.file);
+      chip.appendChild(img);
+    }
+    const span = document.createElement('span');
+    span.textContent = rec.file.name.length > 28 ? rec.file.name.slice(0, 25) + '…' : rec.file.name;
+    chip.appendChild(span);
+    const btn = document.createElement('button');
+    btn.textContent = '✕';
+    btn.title = 'Remove';
+    btn.onclick = ()=>{ state.files = state.files.filter(r => r !== rec); state.target = null; renderFiles(); renderTargets(); };
+    chip.appendChild(btn);
+    list.appendChild(chip);
+  }
+  $('#fileArea').style.display = state.files.length ? 'block' : 'none';
+}
+function availableTargets(){
+  if(!state.files.length) return [];
+  const exts = [...new Set(state.files.map(r => r.ext))];
+  const mk = (list, soon) => list.map(x => ({ ext: x, soon }));
+  if(exts.length === 1){
+    const reg = REG[exts[0]];
+    const t = reg.targets ? mk(reg.targets.split(' '), false) : [];
+    const s = reg.soon ? mk(reg.soon.split(' '), true) : [];
+    const all = [...t, ...s];
+    if(exts[0] !== 'zip') all.push({ ext:'zip', soon:false });
+    if(state.files.length > 1 && state.files.every(r => IMAGE_EXTS.includes(r.ext))){
+      for(const mt of ['pdf', 'gif', 'mp4']){
+        if(!all.some(x => x.ext === mt)) all.push({ ext: mt, soon:false });
+      }
+    }
+    return all;
+  }
+  const allImages = state.files.every(r => IMAGE_EXTS.includes(r.ext));
+  if(allImages) return [...mk(['pdf','gif','mp4','png','jpg','webp','tiff'], false), { ext:'zip', soon:false }];
+  return [{ ext:'zip', soon:false }];
+}
+function renderTargets(){
+  const box = $('#targetChips');
+  box.innerHTML = '';
+  const targets = availableTargets();
+  const firstExt = state.files.length ? state.files[0].ext : '';
+  const label = exts => exts.length === 1 ? '.' + EXT_LABEL[exts[0]] + ' detected' :
+    (state.files.every(r => IMAGE_EXTS.includes(r.ext)) ? 'Multiple images' : 'Multiple files');
+  $('#targetLabel').textContent = 'Convert to  ·  ' + label([firstExt]);
+
+  for(const t of targets){
+    const chip = document.createElement('button');
+    chip.className = 'chip' + (t.soon ? ' soon' : '') + (state.target === t.ext ? ' sel' : '');
+    chip.innerHTML = EXT_LABEL[t.ext] || t.ext.toUpperCase();
+    if(t.soon){
+      chip.innerHTML += '<span class="tag">SOON</span>';
+      chip.title = 'Coming soon';
+    } else {
+      chip.onclick = ()=>{
+        state.target = t.ext;
+        renderTargets();
+        $('#convertBtn').disabled = false;
+      };
+    }
+    box.appendChild(chip);
+  }
+  /* contextual options */
+  const showFlatten = state.files.some(r => ALPHA_EXTS.includes(r.ext)) &&
+    ['jpg','bmp','ico','pdf','eps'].includes(state.target);
+  $('#flattenOpt').style.display = showFlatten ? 'flex' : 'none';
+  const showFrame = VIDEO_EXTS.includes(firstExt) && ['jpg','png'].includes(state.target);
+  $('#frameOpt').style.display = showFrame ? 'flex' : 'none';
+  if(!state.target) $('#convertBtn').disabled = true;
+}
+
+/* ---------- UI: results ---------- */
+function renderResults(results){
+  state.results = results;
+  const box = $('#results');
+  const list = $('#resultList');
+  list.innerHTML = '';
+  $('#resultsCount').textContent = results.length === 1 ? '1 file ready' : results.length + ' files ready';
+  for(const r of results){
+    const row = document.createElement('div');
+    row.className = 'result-row';
+    const ext = (extOf(r.name) || 'file').toUpperCase().slice(0, 4);
+    row.innerHTML =
+      '<div class="ficon">' + ext + '</div>' +
+      '<div class="meta"><div class="name"></div><div class="size">' + fmtSize(r.blob.size) + '</div></div>';
+    row.querySelector('.name').textContent = r.name;
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(r.blob);
+    a.download = r.name;
+    a.textContent = 'Download';
+    row.appendChild(a);
+    list.appendChild(row);
+  }
+  $('#zipAllRow').style.display = results.length > 1 ? 'flex' : 'none';
+  box.className = 'results show';
+  box.scrollIntoView({ behavior:'smooth', block:'nearest' });
+}
+$('#zipAllBtn').onclick = async ()=>{
+  try{
+    showProgress(true); setStatus('Zipping results…');
+    await loadScript(CDN.jszip);
+    const zip = new JSZip();
+    state.results.forEach((r, i)=> zip.file((i+1) + '_' + r.name, r.blob));
+    const blob = await zip.generateAsync({ type:'blob' });
+    downloadBlob(blob, 'convert-it-results.zip');
+  } catch(e){ toast('Could not create ZIP: ' + e.message, true); }
+  finally { showProgress(false); }
+};
+
+/* ---------- UI: run ---------- */
+$('#convertBtn').onclick = async ()=>{
+  if(!state.files.length || !state.target) return;
+  const opts = {
+    quality: $('#quality').value,
+    flatten: $('#flatten').value,
+    frameTime: parseFloat($('#frameTime').value) || 0
+  };
+  $('#convertBtn').disabled = true;
+  $('#results').className = 'results';
+  showProgress(true);
+  try{
+    const results = await doConvert(opts);
+    renderResults(results);
+    toast('Conversion complete! 🎉');
+  } catch(err){
+    console.error(err);
+    toast(err.message || 'Something went wrong during conversion.', true);
+  } finally {
+    showProgress(false);
+    $('#convertBtn').disabled = false;
+  }
+};
+
+/* ---------- drag & drop + input ---------- */
+const drop = $('#drop'), input = $('#fileInput');
+drop.onclick = ()=> input.click();
+input.onchange = ()=>{ if(input.files.length) addFiles(input.files); input.value = ''; };
+;['dragenter','dragover'].forEach(ev => drop.addEventListener(ev, e=>{ e.preventDefault(); drop.classList.add('over'); }));
+;['dragleave','drop'].forEach(ev => drop.addEventListener(ev, e=>{ e.preventDefault(); drop.classList.remove('over'); }));
+drop.addEventListener('drop', e=>{ if(e.dataTransfer.files.length) addFiles(e.dataTransfer.files); });
+$('#clearBtn').onclick = ()=>{
+  state.files = []; state.target = null;
+  renderFiles(); renderTargets();
+  $('#results').className = 'results';
+  $('#fileArea').style.display = 'none';
+};
+
+/* ---------- catalog ---------- */
+(function buildCatalog(){
+  const groups = [
+    { title:'Image Conversions', keys:['jpg','png','webp','heic','svg','gif','ico','tiff'],
+      note:'Transparent backgrounds are preserved for PNG/WEBP (with an option to flatten).' },
+    { title:'Document Conversions', keys:['pdf','docx','txt','epub','pptx','xlsx','xls','csv','doc','mobi'],
+      note:'PDF → JPG/PNG renders every page. OCR converts photos of text into editable TXT/DOCX.' },
+    { title:'Video Conversions', keys:['mp4','mkv','mov','webm','avi'],
+      note:'Video → MP3/WAV extracts audio; Video → JPG/PNG grabs a frame at your chosen timestamp.' },
+    { title:'Audio Conversions', keys:['wav','mp3','flac','m4a','aac','ogg'],
+      note:'MP3 → M4R creates an iPhone ringtone.' },
+    { title:'Cross-Category', keys:[], special:true },
+    { title:'Archive / Compression', keys:['zip','rar'],
+      note:'Multiple images can also be merged into one PDF, GIF or MP4 slideshow.' }
+  ];
+  const body = $('#catalogBody');
+  let n = 0;
+  for(const g of groups){
+    const block = document.createElement('div');
+    block.className = 'cat-block';
+    let html = '<h3><span class="n">' + (++n) + '</span>' + g.title + '</h3>';
+    if(g.special){
+      const pairs = [
+        ['MP4 / MKV / MOV / WEBM', 'MP3, WAV'],
+        ['MP4 / Video', 'GIF, WEBP, JPG, PNG (frame extract)'],
+        ['JPG / PNG (OCR)', 'TXT, DOCX'],
+        ['Multiple images', 'One PDF, GIF slideshow, MP4 slideshow']
+      ];
+      for(const [src, dst] of pairs){
+        html += '<div class="conv-row"><span class="src">' + src + '</span><span class="arr">→</span>' +
+          dst.split(',').map(d => '<span class="dst">' + d.trim() + '</span>').join('') + '</div>';
+      }
+    } else {
+      for(const k of g.keys){
+        const reg = REG[k];
+        const avail = reg.targets ? reg.targets.split(' ') : [];
+        const soon = reg.soon ? reg.soon.split(' ') : [];
+        html += '<div class="conv-row"><span class="src">' + EXT_LABEL[k] + '</span><span class="arr">→</span>' +
+          avail.map(d => '<span class="dst">' + (EXT_LABEL[d] || d.toUpperCase()) + '</span>').join('') +
+          soon.map(d => '<span class="dst soon">' + (EXT_LABEL[d] || d.toUpperCase()) + '</span>').join('') +
+          '</div>';
+      }
+    }
+    if(g.note) html += '<div class="note">' + g.note + '</div>';
+    block.innerHTML = html;
+    body.appendChild(block);
+  }
+})();
+</script>
+</body>
+</html>
